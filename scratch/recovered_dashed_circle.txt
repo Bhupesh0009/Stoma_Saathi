@@ -1,0 +1,146 @@
+--- Step 132 (VIEW_FILE) ---
+66: 8871:                         CustomPaint(
+67: 8872:                           size: const Size(26, 26),
+68: 8873:                           painter: const _DashedCirclePainter(
+69: 8874:                             color: Color(0xFF4CAF50),
+70: 8875:                           ),
+71: 8876:                         ),
+72: 8877:                         const _StomaDot(size: 16),
+73: 8878:                       ],
+74: 8879:                     ),
+75: 8880:                   ),
+76: 8881:                   Positioned.fill(
+77: 8882:                     child: CustomPaint(
+78: 8883:                       painter: const _AnatomyLinesPainter(isIleostomy: true),
+79: 8884:                     ),
+80: 8885:                   ),
+81: 8886:                   Positioned(
+82: 8887:                     top: 8,
+83: 8888:                     left: 0,
+84: 8889:                     right: 0,
+85: 8890:                     child: Text(
+86: 8891:                       isEnglish ? 'Small Intestine' : 'छोटी आंत',
+87: 8892:                       textAlign: TextAlign.center,
+88: 8893:                       style: const TextStyle(
+89: 8894:                         color: Color(0xFF1E2939),
+90: 8895:                         fontSize: 12.5,
+91: 8896:                         fontWeight: FontWeight.w800,
+92: 8897:                       ),
+----------------------------------------
+--- Step 136 (CODE_ACTION) ---
+29: -                        CustomPaint(
+30: -                          size: const Size(26, 26),
+31: -                          painter: const _DashedCirclePainter(
+32: -                            color: Color(0xFF4CAF50),
+33: -                          ),
+34: -                        ),
+35: -                        const _StomaDot(size: 16),
+36: -                      ],
+37: -                    ),
+38: -                  ),
+39: -                  Positioned.fill(
+40: -                    child: CustomPaint(
+41: -                      painter: const _AnatomyLinesPainter(isIleostomy: true),
+42: -                    ),
+43: -                  ),
+44: -                  Positioned(
+45: -                    top: 8,
+46: -                    left: 0,
+47: -                    right: 0,
+48: -                    child: Text(
+49: -                      isEnglish ? 'Small Intestine' : 'छोटी आंत',
+50: -                      textAlign: TextAlign.center,
+51: -                      style: const TextStyle(
+52: -                        color: Color(0xFF1E2939),
+53: -                        fontSize: 12.5,
+54: -                        fontWeight: FontWeight.w800,
+55: -                      ),
+----------------------------------------
+--- Step 168 (VIEW_FILE) ---
+42: 8955:                         CustomPaint(
+43: 8956:                           size: const Size(26, 26),
+44: 8957:                           painter: const _DashedCirclePainter(
+45: 8958:                             color: Color(0xFF2196
+46: <truncated 314 bytes>
+47:                   painter: const _AnatomyLinesPainter(isIleostomy: false),
+48: 8968:                     ),
+49: 8969:                   ),
+50: 8970:                   Positioned(
+51: 8971:                     top: 8,
+52: 8972:                     left: 0,
+53: 8973:                     right: 0,
+54: 8974:                     child: Text(
+55: 8975:                       isEnglish ? 'Large Intestine (Colon)' : 'बड़ी आंत (कोलन)',
+56: 8976:                       textAlign: TextAlign.center,
+57: 8977:                       style: const TextStyle(
+58: 8978:                         color: Color(0xFF1E2939),
+59: 8979:                         fontSize: 12.5,
+60: 8980:                         fontWeight: FontWeight.w800,
+61: 8981:                       ),
+62: 8982:                     ),
+63: 8983:                   ),
+64: 8984:                   Positioned(
+65: 8985:                     bottom: 30,
+66: 8986:                     right: 14,
+67: 8987:                     child: Text(
+68: 8988:                       isEnglish ? 'Stoma' : 'स्टोमा',
+----------------------------------------
+--- Step 170 (CODE_ACTION) ---
+29: -                        CustomPaint(
+30: -                          size: const Size(26, 26),
+31: -                          painter: const _DashedCirclePainter(
+32: -                            color: Color(0xFF2196F3),
+33: -                          ),
+34: -                        ),
+35: -                        const _StomaDot(size: 16),
+36: -                      ],
+37: -                    ),
+38: -                  ),
+39: -                  Positioned.fill(
+40: -                    child: CustomPaint(
+41: -                      painter: const _AnatomyLinesPainter(isIleostomy: false),
+42: -                    ),
+43: -                  ),
+44: -                  Positioned(
+45: -                    top: 8,
+46: -                    left: 0,
+47: -                    right: 0,
+48: -                    child: Text(
+49: -                      isEnglish ? 'Large Intestine (Colon)' : 'बड़ी आंत (कोलन)',
+50: -                      textAlign: TextAlign.center,
+51: -                      style: const TextStyle(
+52: -                        color: Color(0xFF1E2939),
+53: -                        fontSize: 12.5,
+54: -                        fontWeight: FontWeight.w800,
+55: -                      ),
+----------------------------------------
+--- Step 172 (RUN_COMMAND) ---
+--- Step 404 (RUN_COMMAND) ---
+9: 66: 8871:                         CustomPaint(
+10: 67: 8872:                           size: const Size(26, 26),
+11: 68: 8873:                           painter: const _DashedCirclePainter(
+12: 69: 8874:                             color: Color(0xFF4CAF50),
+13: 70: 8875:                           ),
+14: 71: 8876:                         ),
+15: 72: 8877:                         const _StomaDot(size: 16),
+16: 73: 8878:                       ],
+17: 74: 8879:                     ),
+18: 75: 8880:                   ),
+19: 76: 8881:                   Positioned.fill(
+20: 77: 8882:                     child: CustomPaint(
+21: 78: 8883:                       painter: const _AnatomyLinesPainter(isIleostomy: true),
+22: 79: 8884:                     ),
+23: 80: 8885:                   ),
+24: 81: 8886:                   Positioned(
+25: 82: 8887:                     top: 8,
+26: 83: 8888:                     left: 0,
+27: 84: 8889:                     right: 0,
+28: 85: 8890:                     child: Text(
+29: Traceback (most recent call last):
+30:   File "c:\Users\Bhupesh\Desktop\Stoma Saathi\scratch\search_dashed_circle.py", line 17, in <module>
+31:     print(f"{k}: {lines[k]}")
+32:   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\encodings\cp1252.py", line 19, in encode
+33:     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+34:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+35: UnicodeEncodeError: 'charmap' codec can't encode characters in position 65-68: character maps to <undefined>
+----------------------------------------
