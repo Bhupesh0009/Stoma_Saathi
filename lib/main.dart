@@ -12,6 +12,7 @@ import 'screens/about_app_screen.dart';
 import 'screens/disclaimer_screen.dart';
 import 'screens/module_5/index.dart';
 import 'screens/module_6/index.dart';
+import 'services/github_update_checker.dart';
 
 void main() {
   runApp(const StomaSaathiApp());
@@ -110,33 +111,35 @@ class _StomaSaathiAppState extends State<StomaSaathiApp> {
             )
           : SplashScreen(
               onDone: () {},
-              child: _isLoggedIn
-                  ? AppShell(
-                      language: _language,
-                      onLanguageChanged: _updateLanguage,
-                      onLogout: () async {
-                        try {
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool('stoma_logged_in', false);
-                        } catch (_) {}
-                        setState(() {
-                          _isLoggedIn = false;
-                        });
-                      },
-                    )
-                  : LoginPage(
-                      language: _language,
-                      onLanguageChanged: _updateLanguage,
-                      onLoginSuccess: () async {
-                        try {
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool('stoma_logged_in', true);
-                        } catch (_) {}
-                        setState(() {
-                          _isLoggedIn = true;
-                        });
-                      },
-                    ),
+              child: GithubUpdateChecker(
+                child: _isLoggedIn
+                    ? AppShell(
+                        language: _language,
+                        onLanguageChanged: _updateLanguage,
+                        onLogout: () async {
+                          try {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setBool('stoma_logged_in', false);
+                          } catch (_) {}
+                          setState(() {
+                            _isLoggedIn = false;
+                          });
+                        },
+                      )
+                    : LoginPage(
+                        language: _language,
+                        onLanguageChanged: _updateLanguage,
+                        onLoginSuccess: () async {
+                          try {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setBool('stoma_logged_in', true);
+                          } catch (_) {}
+                          setState(() {
+                            _isLoggedIn = true;
+                          });
+                        },
+                      ),
+              ),
             ),
     );
   }
