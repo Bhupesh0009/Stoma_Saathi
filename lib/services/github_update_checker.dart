@@ -3,15 +3,12 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const String _githubOwner = 'Bhupesh0009';
 const String _githubRepo = 'Stoma_Saathi';
-const String _currentAppVersion = String.fromEnvironment(
-  'APP_VERSION',
-  defaultValue: '1.0.0',
-);
 
 class GithubUpdateChecker extends StatefulWidget {
   const GithubUpdateChecker({super.key, required this.child});
@@ -41,8 +38,9 @@ class _GithubUpdateCheckerState extends State<GithubUpdateChecker> {
     }
 
     try {
+      final currentVersion = await _currentInstalledVersion();
       final release = await GithubReleaseService.fetchLatestRelease();
-      if (release == null || !release.isNewerThan(_currentAppVersion)) {
+      if (release == null || !release.isNewerThan(currentVersion)) {
         return;
       }
 
@@ -55,15 +53,24 @@ class _GithubUpdateCheckerState extends State<GithubUpdateChecker> {
       if (!mounted) {
         return;
       }
-      await _showUpdateDialog(release, prefs);
+      await _showUpdateDialog(release, prefs, currentVersion);
     } catch (_) {
       // Update checks should never interrupt normal app usage.
     }
   }
 
+  Future<String> _currentInstalledVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (packageInfo.buildNumber.isEmpty) {
+      return packageInfo.version;
+    }
+    return '${packageInfo.version}+${packageInfo.buildNumber}';
+  }
+
   Future<void> _showUpdateDialog(
     GithubRelease release,
     SharedPreferences prefs,
+    String currentVersion,
   ) async {
     final downloadUrl = release.preferredDownloadUrl;
     await showDialog<void>(
@@ -77,7 +84,7 @@ class _GithubUpdateCheckerState extends State<GithubUpdateChecker> {
           title: const Text('Update available'),
           content: Text(
             'Stoma Saathi ${release.versionTag} is available. '
-            'You are using $_currentAppVersion.',
+            'You are using $currentVersion.',
           ),
           actions: [
             TextButton(
@@ -178,23 +185,25 @@ class GithubRelease {
   }
 
   bool isNewerThan(String currentVersion) {
-    final latestParts = _versionParts(versionTag);
-    final currentParts = _versionParts(currentVersion);
-    final maxLength = latestParts.length > currentParts.length
-        ? latestParts.length
-        : currentParts.length;
+    final latestVersion = _ReleaseVersion.parse(versionTag);
+    final current = _ReleaseVersion.parse(currentVersion);
+    final maxLength = latestVersion.parts.length > current.parts.length
+        ? latestVersion.parts.length
+        : current.parts.length;
 
     for (var i = 0; i < maxLength; i++) {
-      final latest = i < latestParts.length ? latestParts[i] : 0;
-      final current = i < currentParts.length ? currentParts[i] : 0;
-      if (latest > current) {
+      final latestPart = i < latestVersion.parts.length
+          ? latestVersion.parts[i]
+          : 0;
+      final currentPart = i < current.parts.length ? current.parts[i] : 0;
+      if (latestPart > currentPart) {
         return true;
       }
-      if (latest < current) {
+      if (latestPart < currentPart) {
         return false;
       }
     }
-    return false;
+    return latestVersion.buildNumber > current.buildNumber;
   }
 
   GithubReleaseAsset? _assetForCurrentPlatform() {
@@ -216,19 +225,6 @@ class GithubRelease {
     }
     return null;
   }
-
-  static List<int> _versionParts(String version) {
-    final normalized = version
-        .trim()
-        .replaceFirst(RegExp(r'^[vV]'), '')
-        .split(RegExp(r'[-+]'))
-        .first;
-
-    return normalized
-        .split('.')
-        .map((part) => int.tryParse(part) ?? 0)
-        .toList(growable: false);
-  }
 }
 
 class GithubReleaseAsset {
@@ -236,4 +232,27 @@ class GithubReleaseAsset {
 
   final String name;
   final String downloadUrl;
+}
+
+class _ReleaseVersion {
+  const _ReleaseVersion({required this.parts, required this.buildNumber});
+
+  final List<int> parts;
+  final int buildNumber;
+
+  static _ReleaseVersion parse(String version) {
+    final normalized = version.trim().replaceFirst(RegExp(r'^[vV]'), '');
+    final buildSplit = normalized.split('+');
+    final parts = buildSplit.first
+        .split('-')
+        .first
+        .split('.')
+        .map((part) => int.tryParse(part) ?? 0)
+        .toList(growable: false);
+    final buildNumber = buildSplit.length > 1
+        ? int.tryParse(buildSplit[1].split('-').first) ?? 0
+        : 0;
+
+    return _ReleaseVersion(parts: parts, buildNumber: buildNumber);
+  }
 }
