@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1726,6 +1728,130 @@ class _ModuleTwoScreen extends StatelessWidget {
   }
 }
 
+class _FullscreenVideoPlayerScreen extends StatefulWidget {
+  final String videoPath;
+  final String title;
+
+  const _FullscreenVideoPlayerScreen({
+    required this.videoPath,
+    required this.title,
+  });
+
+  @override
+  State<_FullscreenVideoPlayerScreen> createState() => _FullscreenVideoPlayerScreenState();
+}
+
+class _FullscreenVideoPlayerScreenState extends State<_FullscreenVideoPlayerScreen> {
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
+  bool _error = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePlayer();
+  }
+
+  Future<void> _initializePlayer() async {
+    try {
+      _videoPlayerController = VideoPlayerController.asset(widget.videoPath);
+      await _videoPlayerController.initialize();
+      
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        autoPlay: true,
+        looping: false,
+        deviceOrientationsOnEnterFullScreen: [
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ],
+        deviceOrientationsAfterFullScreen: [
+          DeviceOrientation.portraitUp,
+        ],
+        materialProgressColors: ChewieProgressColors(
+          playedColor: Colors.blueAccent,
+          handleColor: Colors.blue,
+          backgroundColor: Colors.white24,
+          bufferedColor: Colors.white54,
+        ),
+        placeholder: Container(
+          color: Colors.black,
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                errorMessage,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        },
+      );
+      
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = true;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _chewieController?.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          widget.title,
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: SafeArea(
+        child: _error
+            ? const Center(
+                child: Text(
+                  'Error playing video',
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            : _chewieController != null &&
+                    _chewieController!.videoPlayerController.value.isInitialized
+                ? Chewie(
+                    controller: _chewieController!,
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+      ),
+    );
+  }
+}
+
 class _ModuleThreeScreen extends StatelessWidget {
   const _ModuleThreeScreen({
     required this.module,
@@ -1737,73 +1863,33 @@ class _ModuleThreeScreen extends StatelessWidget {
   static const _body = Color(0xFF111827);
   static const _items = [
     _ProcedureItemSpec(
-      title: 'Removing the Old Pouch',
-      hindiTitle: 'पुराना पाउच हटाना',
+      title: 'Hand Hygiene Before Stoma Care and Materials Required Before Stoma Care',
+      hindiTitle: 'स्टोमा देखभाल से पहले हाथों की स्वच्छता और आवश्यक सामग्री',
       color: Color(0xFF078B2F),
       icon: Icons.play_arrow_rounded,
       subtitle: 'Watch Video',
       hindiSubtitle: 'वीडियो देखें',
     ),
     _ProcedureItemSpec(
-      title: 'Cleaning the Stoma & Skin',
-      hindiTitle: 'स्टोमा और त्वचा साफ करना',
+      title: 'How to Empty the Stoma Bag and Remove the Old Bag Safely',
+      hindiTitle: 'स्टोमा बैग खाली करने और पुराने बैग को सुरक्षित रूप से हटाने की विधि',
       color: Color(0xFF168AF2),
       icon: Icons.play_arrow_rounded,
       subtitle: 'Watch Video',
       hindiSubtitle: 'वीडियो देखें',
     ),
     _ProcedureItemSpec(
-      title: 'Measuring the Stoma',
-      hindiTitle: 'स्टोमा मापना',
+      title: 'Cleaning Around the Stoma',
+      hindiTitle: 'स्टोमा के आसपास की सफाई',
       color: Color(0xFF7650D6),
       icon: Icons.play_arrow_rounded,
       subtitle: 'Watch Video',
       hindiSubtitle: 'वीडियो देखें',
     ),
     _ProcedureItemSpec(
-      title: 'Cutting the Wafer',
-      hindiTitle: 'वेफर काटना',
+      title: 'Measuring and Preparing the New Bag and Applying a New Bag',
+      hindiTitle: 'नए बैग को मापना, तैयार करना और लगाना',
       color: Color(0xFFE93B55),
-      icon: Icons.play_arrow_rounded,
-      subtitle: 'Watch Video',
-      hindiSubtitle: 'वीडियो देखें',
-    ),
-    _ProcedureItemSpec(
-      title: 'Applying Skin Barrier',
-      hindiTitle: 'स्किन बैरियर लगाना',
-      color: Color(0xFFFF8700),
-      icon: Icons.play_arrow_rounded,
-      subtitle: 'Watch Video',
-      hindiSubtitle: 'वीडियो देखें',
-    ),
-    _ProcedureItemSpec(
-      title: 'Placing and Sealing the Pouch',
-      hindiTitle: 'पाउच लगाना और सील करना',
-      color: Color(0xFF1197A2),
-      icon: Icons.play_arrow_rounded,
-      subtitle: 'Watch Video',
-      hindiSubtitle: 'वीडियो देखें',
-    ),
-    _ProcedureItemSpec(
-      title: 'Checking for Leakage',
-      hindiTitle: 'लीकेज जांचना',
-      color: Color(0xFF111111),
-      icon: Icons.visibility_rounded,
-      subtitle: 'Read Only',
-      hindiSubtitle: 'केवल पढ़ें',
-    ),
-    _ProcedureItemSpec(
-      title: 'Emptying the Pouch',
-      hindiTitle: 'पाउच खाली करना',
-      color: Color(0xFF1178D9),
-      icon: Icons.play_arrow_rounded,
-      subtitle: 'Watch Video',
-      hindiSubtitle: 'वीडियो देखें',
-    ),
-    _ProcedureItemSpec(
-      title: 'Disposal of Used Materials',
-      hindiTitle: 'उपयोग की चीजें फेंकना',
-      color: Color(0xFF22B72E),
       icon: Icons.play_arrow_rounded,
       subtitle: 'Watch Video',
       hindiSubtitle: 'वीडियो देखें',
@@ -1896,16 +1982,17 @@ class _ModuleThreeScreen extends StatelessWidget {
                 spec: _items[i],
                 language: language,
                 onTap: () {
-                  if (i >= module.lessons.length) {
-                    return;
-                  }
+                  final videoPaths = [
+                    'assets/videos/video1.mp4',
+                    'assets/videos/video2.mp4',
+                    'assets/videos/video3.mp4',
+                    'assets/videos/video4.mp4',
+                  ];
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => LessonScreen(
-                        module: module,
-                        lesson: module.lessons[i],
-                        language: language,
-                        onLanguageChanged: onLanguageChanged,
+                      builder: (_) => _FullscreenVideoPlayerScreen(
+                        videoPath: videoPaths[i],
+                        title: _items[i].titleFor(language),
                       ),
                     ),
                   );
@@ -1917,6 +2004,15 @@ class _ModuleThreeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _ModuleThreeBrandHeader extends StatelessWidget {
+  const _ModuleThreeBrandHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox.shrink();
   }
 }
 
@@ -1943,15 +2039,6 @@ class _ProcedureItemSpec {
 
   String subtitleFor(AppLanguage language) {
     return language == AppLanguage.english ? subtitle : hindiSubtitle;
-  }
-}
-
-class _ModuleThreeBrandHeader extends StatelessWidget {
-  const _ModuleThreeBrandHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink();
   }
 }
 
@@ -14765,201 +14852,51 @@ List<ModuleData> buildModules() {
       lessons: [
         LessonData(
           title: const LocalizedText(
-            'Removing the Old Pouch',
-            'पुराना पाउच हटाना',
+            'Hand Hygiene Before Stoma Care and Materials Required Before Stoma Care',
+            'स्टोमा देखभाल से पहले हाथों की स्वच्छता और आवश्यक सामग्री',
           ),
           summary: const LocalizedText(
-            'Remove the pouch slowly from top to bottom while supporting the skin.',
-            'त्वचा को सहारा देते हुए पाउच को ऊपर से नीचे की ओर धीरे-धीरे हटाएं।',
+            'Learn proper hand hygiene and prepare all required materials before starting stoma care.',
+            'स्टोमा देखभाल शुरू करने से पहले सही हाथों की स्वच्छता और आवश्यक सामग्री की तैयारी सीखें।',
           ),
-          points: const [
-            LocalizedText(
-              'Wash your hands before starting.',
-              'शुरू करने से पहले हाथ धोएं।',
-            ),
-            LocalizedText(
-              'Use adhesive remover if needed.',
-              'ज़रूरत हो तो एडहेसिव रिमूवर का उपयोग करें।',
-            ),
-            LocalizedText(
-              'Support the skin with one hand.',
-              'एक हाथ से त्वचा को सहारा दें।',
-            ),
-          ],
-          warnings: const [
-            LocalizedText(
-              'Do not pull forcefully; it can damage the skin.',
-              'जोर से न खींचें; इससे त्वचा को नुकसान हो सकता है।',
-            ),
-          ],
-          color: const Color(0xFF2E7D32),
+          points: const [],
+          color: const Color(0xFF078B2F),
         ),
         LessonData(
           title: const LocalizedText(
-            'Cleaning the Stoma and Skin',
-            'स्टोमा और त्वचा की सफाई',
+            'How to Empty the Stoma Bag and Remove the Old Bag Safely',
+            'स्टोमा बैग खाली करने और पुराने बैग को सुरक्षित रूप से हटाने की विधि',
           ),
           summary: const LocalizedText(
-            'Clean gently with warm water and pat dry.',
-            'गुनगुने पानी से धीरे-धीरे साफ करें और थपथपाकर सुखाएं।',
+            'Step-by-step demonstration of safely emptying the stoma pouch and removing the old bag.',
+            'स्टोमा पाउच को सुरक्षित रूप से खाली करने और पुराने बैग को हटाने की चरण-दर-चरण प्रक्रिया।',
           ),
-          points: const [
-            LocalizedText(
-              'Use soft cloth or gauze.',
-              'मुलायम कपड़ा या गॉज का उपयोग करें।',
-            ),
-            LocalizedText(
-              'Use mild soap only if advised.',
-              'हल्का साबुन केवल सलाह मिलने पर ही उपयोग करें।',
-            ),
-            LocalizedText('Do not rub the stoma.', 'स्टोमा को रगड़ें नहीं।'),
-          ],
-          tips: const [
-            LocalizedText(
-              'A little bleeding during cleaning may be normal.',
-              'सफाई के दौरान थोड़ा रक्तस्राव सामान्य हो सकता है।',
-            ),
-          ],
-          color: const Color(0xFF1976D2),
-        ),
-        LessonData(
-          title: const LocalizedText('Measuring the Stoma', 'स्टोमा को मापना'),
-          summary: const LocalizedText(
-            'Measure the stoma regularly, especially in the first 6–8 weeks.',
-            'स्टोमा को नियमित रूप से मापें, खासकर पहले 6–8 हफ्तों में।',
-          ),
-          points: const [
-            LocalizedText(
-              'Use the measuring guide to check exact size.',
-              'सही आकार जानने के लिए माप गाइड का उपयोग करें।',
-            ),
-            LocalizedText(
-              'Correct size helps prevent leakage.',
-              'सही आकार रिसाव रोकने में मदद करता है।',
-            ),
-          ],
-          color: const Color(0xFF5E35B1),
-        ),
-        LessonData(
-          title: const LocalizedText('Cutting the Wafer', 'वेफर काटना'),
-          summary: const LocalizedText(
-            'Cut the wafer opening according to the measured size.',
-            'मापे गए आकार के अनुसार वेफर की खुली जगह काटें।',
-          ),
-          points: const [
-            LocalizedText(
-              'The fit should be snug but not tight.',
-              'फिटिंग ठीक हो, लेकिन बहुत कसी हुई न हो।',
-            ),
-            LocalizedText(
-              'Too large can cause leakage.',
-              'बहुत बड़ा कट रिसाव का कारण बन सकता है।',
-            ),
-            LocalizedText(
-              'Too small can hurt the stoma.',
-              'बहुत छोटा कट स्टोमा को चोट पहुंचा सकता है।',
-            ),
-          ],
-          color: const Color(0xFFE91E63),
+          points: const [],
+          color: const Color(0xFF168AF2),
         ),
         LessonData(
           title: const LocalizedText(
-            'Applying Skin Barrier',
-            'स्किन बैरियर लगाना',
+            'Cleaning Around the Stoma',
+            'स्टोमा के आसपास की सफाई',
           ),
           summary: const LocalizedText(
-            'Apply barrier ring, paste or wipe around the skin if advised.',
-            'सलाह मिलने पर त्वचा के आसपास बैरियर रिंग, पेस्ट या वाइप लगाएं।',
+            'Learn the correct technique for cleaning the skin around the stoma.',
+            'स्टोमा के आसपास की त्वचा की सही सफाई की विधि सीखें।',
           ),
-          points: const [
-            LocalizedText(
-              'Cover the surrounding skin evenly.',
-              'आसपास की त्वचा को समान रूप से ढकें।',
-            ),
-            LocalizedText(
-              'This protects skin and improves sealing.',
-              'यह त्वचा की रक्षा करता है और सीलिंग बेहतर बनाता है।',
-            ),
-          ],
-          color: const Color(0xFFFF9800),
+          points: const [],
+          color: const Color(0xFF7650D6),
         ),
         LessonData(
           title: const LocalizedText(
-            'Placing and Sealing the Pouch',
-            'पाउच लगाना और सील करना',
+            'Measuring and Preparing the New Bag and Applying a New Bag',
+            'नए बैग को मापना, तैयार करना और लगाना',
           ),
           summary: const LocalizedText(
-            'Place the pouch gently over the stoma and press firmly.',
-            'स्टोमा पर पाउच धीरे से रखें और अच्छी तरह दबाएं।',
+            'Learn how to measure the stoma, prepare the new pouch, and apply it correctly.',
+            'स्टोमा को मापने, नया पाउच तैयार करने और उसे सही तरीके से लगाने की प्रक्रिया सीखें।',
           ),
-          points: const [
-            LocalizedText(
-              'Press for a few seconds to secure it.',
-              'ठीक से चिपकाने के लिए कुछ सेकंड दबाकर रखें।',
-            ),
-            LocalizedText(
-              'Ensure there are no gaps or folds.',
-              'ध्यान रखें कि कहीं गैप या मोड़ न हों।',
-            ),
-          ],
-          color: const Color(0xFF0097A7),
-        ),
-        LessonData(
-          title: const LocalizedText('Checking for Leakage', 'रिसाव की जांच'),
-          summary: const LocalizedText(
-            'Check pouch edges and look for wetness or smell.',
-            'पाउच के किनारों की जांच करें और नमी या गंध पर ध्यान दें।',
-          ),
-          points: const [
-            LocalizedText(
-              'Inspect the seal after applying the pouch.',
-              'पाउच लगाने के बाद सील की जांच करें।',
-            ),
-            LocalizedText(
-              'Leakage can irritate the surrounding skin.',
-              'रिसाव आसपास की त्वचा को नुकसान पहुंचा सकता है।',
-            ),
-          ],
-          color: const Color(0xFF3949AB),
-        ),
-        LessonData(
-          title: const LocalizedText('Emptying the Pouch', 'पाउच खाली करना'),
-          summary: const LocalizedText(
-            'Empty the pouch when it is about one-third to half full.',
-            'जब पाउच लगभग एक-तिहाई से आधा भर जाए, तब उसे खाली करें।',
-          ),
-          points: const [
-            LocalizedText(
-              'Sit or stand comfortably near the toilet.',
-              'टॉयलेट के पास आराम से बैठें या खड़े हों।',
-            ),
-            LocalizedText(
-              'Clean the outlet after emptying.',
-              'खाली करने के बाद आउटलेट साफ करें।',
-            ),
-          ],
-          color: const Color(0xFF1E88E5),
-        ),
-        LessonData(
-          title: const LocalizedText(
-            'Disposal of Used Materials',
-            'उपयोग की गई सामग्री का निपटान',
-          ),
-          summary: const LocalizedText(
-            'Wrap used materials in a disposal bag and throw away hygienically.',
-            'उपयोग की गई सामग्री को डिस्पोजल बैग में लपेटकर स्वच्छ तरीके से फेंकें।',
-          ),
-          points: const [
-            LocalizedText(
-              'Seal the bag properly before disposal.',
-              'फेंकने से पहले बैग को अच्छी तरह बंद करें।',
-            ),
-            LocalizedText(
-              'Proper disposal helps avoid odor and infection.',
-              'सही निपटान दुर्गंध और संक्रमण के जोखिम को कम करता है।',
-            ),
-          ],
-          color: const Color(0xFF43A047),
+          points: const [],
+          color: const Color(0xFFE93B55),
         ),
       ],
     ),
