@@ -1146,8 +1146,8 @@ class _ModuleEightSupportScreen extends StatelessWidget {
     required this.onLanguageChanged,
   });
 
-  static final _callUri = Uri.parse('tel:8882752099');
-  static final _whatsAppUri = Uri.parse('https://wa.me/918882752099');
+  static final _callUri = Uri.parse('tel:7011024081');
+  static final _whatsAppUri = Uri.parse('https://wa.me/917011024081');
 
   final AppLanguage language;
   final ValueChanged<AppLanguage> onLanguageChanged;
